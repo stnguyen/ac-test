@@ -18,3 +18,9 @@ export const sanitizeString = (str: string) =>
 export function levenshteinDistance(text1: string, text2: string) {
   return levenshtein.get(text1, text2);
 }
+
+/**
+ * change a regexp pattern to match the beginning of the string
+ * @param pattern
+ */
+export const prefixRegex = (pattern: string): string => `^${pattern}`;
