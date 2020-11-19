@@ -1,4 +1,4 @@
-import { get, set, clear, fromCacheOr } from "../cache";
+import { get, set, clear, fromCacheOr } from "./cache";
 
 describe.only("Cache", () => {
   beforeAll(() => {

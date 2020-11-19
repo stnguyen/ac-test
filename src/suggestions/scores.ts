@@ -30,7 +30,6 @@ export function withLevensteinDistanceScore(
 /**
  * weigh similar results depending on the distance to a given point
  * the scores must in order to produce a scale
-
  */
 export function withGeoDistanceScore(
   reference: RawCoordinates,
@@ -77,6 +76,7 @@ export function validateParamsMiddleware(req: Request) {
     req.query.longitude,
   ];
   const hasQuery = query && query !== "";
+
   const hasLatitude = !isNaN(parseFloat((latitude as string) ?? ""));
   const hasLongitude = !isNaN(parseFloat((longitude as string) ?? ""));
 

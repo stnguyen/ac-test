@@ -1,5 +1,5 @@
 import omit from "lodash/fp/omit";
-import { suggestFromList } from "../suggestions/fromList";
+import { suggestFromList } from "./fromList";
 
 const sampleDb = {
   cities: [

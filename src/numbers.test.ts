@@ -1,4 +1,4 @@
-import { twoDecimalsAtMost } from "../numbers";
+import { twoDecimalsAtMost } from "./numbers";
 
 describe("twoDecimalsAtMost", () => {
   it("should return 2 decimal if needed", () => {

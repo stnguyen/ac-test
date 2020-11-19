@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import rateLimit from "express-rate-limit";
 import { fromCacheOr } from "./cache";
 
-import { validateParamsMiddleware } from "./suggestions/transformers";
+import { validateParamsMiddleware } from "./suggestions/scores";
 import { suggestFromList } from "./suggestions/fromList";
 import { suggestFromIndex } from "./suggestions/fromIndex";
 import { CityDatabase } from "./cities";
-import { Suggester, Suggestion, SuggestionsResults } from "./suggestions/types";
+import { Suggester, SuggestionsResults } from "./suggestions/types";
 
 /** the main process of computing suggestions */
 function suggestionBaseEndpoint(
@@ -32,7 +32,7 @@ function suggestionBaseEndpoint(
 
     // no results there
     if (suggested.suggestions.length === 0)
-      return res.status(404).end(suggested);
+      return res.status(404).json(suggested);
     // we got results yeah !
     return res.json(suggested);
   };

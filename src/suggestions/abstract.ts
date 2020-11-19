@@ -1,7 +1,4 @@
-import {
-  withGeoDistanceScore,
-  withLevensteinDistanceScore,
-} from "./transformers";
+import { withGeoDistanceScore, withLevensteinDistanceScore } from "./scores";
 import { CityDatabase } from "../cities";
 import { CityFinder, Suggester, SuggestionsResults } from "./types";
 import { sortByNumericalField } from "../sort";

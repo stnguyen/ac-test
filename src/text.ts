@@ -9,7 +9,7 @@ export const sanitizeString = (str: string) =>
     .replace(/[éèêë]/g, "e")
     .replace(/[àâä]/g, "a")
     .replace(/[ïìî]/g, "i")
-    .replace(/[üûù]/g, "u")
+    .replace(/[ûüùúū]/g, "u")
     .replace(/[ôòö]/g, "o");
 
 /**
