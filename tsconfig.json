@@ -1,0 +1,8 @@
+{
+  "include": ["src/**/*.ts"],
+  "compilerOptions": {
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  }
+}

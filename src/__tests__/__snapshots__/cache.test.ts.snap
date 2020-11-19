@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Cache set should support a custom serializer 1`] = `
+Object {
+  "json": undefined,
+  "serialized": undefined,
+}
+`;

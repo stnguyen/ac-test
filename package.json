@@ -1,0 +1,49 @@
+{
+  "name": "ac-challenge",
+  "version": "0.1.0",
+  "description": "coding challenge in Nodejs",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "jest --collectCoverage",
+    "dev": "ts-node-dev --respawn --transpile-only app",
+    "benchmark:list-index": "node --expose-gc scripts/benchmark-list-index.js",
+    "benchmark:prod": "curl https://PROD_URL.herokuapp.com/suggestions?q=B && artillery quick --count 50 -n 50 https://https://PROD_URL.herokuapp.com/suggestions?q=B",
+    "benchmark:prod:nolimit": "curl https://PROD_URL.herokuapp.com/suggestions?q=B && artillery quick --count 50 -n 50 https://PROD_URL.herokuapp.com/suggestions-nolimit?q=B",
+    "benchmark:dev": "artillery quick --count 50 -n 50 http://localhost:2345/suggestions?q=B",
+    "benchmark:dev:nolimit": "artillery quick --count 50 -n 50 http://localhost:2345/suggestions-nolimit?q=B",
+    "benchmark:index:nolimit": "artillery quick --count 50 -n 50 http://localhost:2345/suggestions-index-nocache?q=B",
+    "benchmark:prod:index:nolimit": "artillery quick --count 50 -n 50 https://busbud-suggestions-tclain.herokuapp.com/suggestions-index-nocache?q=B",
+    "index:data": "node scripts/indexData data/cities_canada-usa.tsv data/db.json"
+  },
+  "author": "Timothee Clain",
+  "license": "WTFPL",
+  "dependencies": {
+    "@turf/distance": "^6.2.0-alpha.2",
+    "express": "^4.16.4",
+    "express-rate-limit": "^3.3.2",
+    "fast-levenshtein": "^2.0.6",
+    "line-reader": "^0.4.0",
+    "lodash": "^4.17.11",
+    "nodemon": "^1.18.7",
+    "query-string": "^6.2.0",
+    "supertest": "^3",
+    "test": "^0.6.0"
+  },
+  "engines": {
+    "node": "12.x"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.9",
+    "@types/fast-levenshtein": "^0.0.1",
+    "@types/jest": "^26.0.15",
+    "@types/line-reader": "^0.0.30",
+    "@types/lodash": "^4.14.165",
+    "@types/supertest": "^2.0.10",
+    "artillery": "^1.6.0-26",
+    "jest": "^24",
+    "ts-jest": "^26.4.4",
+    "ts-node-dev": "^1.0.0",
+    "typescript": "^4.0.5"
+  }
+}
