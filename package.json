@@ -8,13 +8,10 @@
     "test": "jest --collectCoverage",
     "dev": "ts-node-dev --respawn --transpile-only app",
     "benchmark:list-index": "node --expose-gc scripts/benchmark-list-index.js",
-    "benchmark:prod": "curl https://PROD_URL.herokuapp.com/suggestions?q=B && artillery quick --count 50 -n 50 https://https://PROD_URL.herokuapp.com/suggestions?q=B",
-    "benchmark:prod:nolimit": "curl https://PROD_URL.herokuapp.com/suggestions?q=B && artillery quick --count 50 -n 50 https://PROD_URL.herokuapp.com/suggestions-nolimit?q=B",
     "benchmark:dev": "artillery quick --count 50 -n 50 http://localhost:2345/suggestions?q=B",
-    "benchmark:dev:nolimit": "artillery quick --count 50 -n 50 http://localhost:2345/suggestions-nolimit?q=B",
-    "benchmark:index:nolimit": "artillery quick --count 50 -n 50 http://localhost:2345/suggestions-index-nocache?q=B",
-    "benchmark:prod:index:nolimit": "artillery quick --count 50 -n 50 https://busbud-suggestions-tclain.herokuapp.com/suggestions-index-nocache?q=B",
-    "index:data": "node scripts/indexData data/cities_canada-usa.tsv data/db.json"
+    "benchmark:dev:no-rate-limit": "artillery quick --count 50 -n 50 http://localhost:2345/suggestions-nolimit?q=B",
+    "benchmark:index:no-rate-limit": "artillery quick --count 50 -n 50 http://localhost:2345/suggestions-index-nocache?q=B",
+    "index:data": "ts-node-dev --transpile-only scripts/indexData data/cities_canada-usa.tsv data/db.json"
   },
   "author": "Timothee Clain",
   "license": "WTFPL",

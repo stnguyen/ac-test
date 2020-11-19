@@ -1,5 +1,5 @@
 /* istanbul ignore */
-const { indexCities } = require("../src/cities");
+import { CityDatabase, indexCities } from "../src/cities";
 /** the arguments provided */
 
 const argv = process.argv;
@@ -9,7 +9,7 @@ const fs = require("fs");
 /**
  * display help message
  */
-function help(message = "") {
+function help(message: string = "") {
   console.log(
     "USAGE node indexData inputTsvFilePath outputJsonIndexPath \n",
     message !== "" ? `Error: ${message}` : ""
@@ -25,7 +25,7 @@ function getArgsFromCommand() {
   return [input, output];
 }
 
-function checkData(data) {
+function checkData(data: CityDatabase) {
   return data.cities.every((item) =>
     ["latitude", "longitude"].every((key) => !isNaN(parseFloat(item[key])))
   );
@@ -36,7 +36,7 @@ function checkData(data) {
 // some good pythonic memories :-)
 const [input, output] = getArgsFromCommand();
 
-indexCities(input).then((data) => {
+indexCities(input).then((data: CityDatabase) => {
   // write the database back to file
   if (checkData(data)) {
     console.log("Data has been checked");

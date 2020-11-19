@@ -1,5 +1,4 @@
 import { Transformer } from "./types";
-import curry from "lodash";
 
 /** a standard tsv limiter */
 const TSV_DELIMITER = /\t/;

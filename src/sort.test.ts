@@ -1,4 +1,4 @@
-import { sortByNumericalField } from "../sort";
+import { sortByNumericalField } from "./sort";
 
 describe("sortByNumericalField", () => {
   it("should return an array of predicates sorted by the value of field at the given key", () => {

@@ -1,4 +1,4 @@
-import { sortByDistance, distanceBetween, numericalCoordinate } from "../geo";
+import { sortByDistance, distanceBetween, numericalCoordinate } from "./geo";
 
 describe("numericalCoordinate", () => {
   it("should convert coordinate to numerical values", () => {

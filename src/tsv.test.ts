@@ -1,4 +1,4 @@
-import { lineToMap } from "../tsv";
+import { lineToMap } from "./tsv";
 
 describe("TSV utils", () => {
   it("lineToMap should transform a line to an object according to the headers list, the input transformer, and a delimiter", () => {
