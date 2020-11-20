@@ -3,6 +3,10 @@
 import { Handler, Request } from "express";
 import { CityDatabase } from "./cities/types";
 
+/**
+ * inject the db down the middleware chain
+ * @param DB
+ */
 export const dbMiddleware = (DB: CityDatabase): Handler => (
   req,
   _res,
@@ -12,6 +16,7 @@ export const dbMiddleware = (DB: CityDatabase): Handler => (
   next();
 };
 
+/** retrieve the db from the middlware chain */
 export const getDb = (req: Request): CityDatabase => {
   return req.app.locals.db;
 };

@@ -20,7 +20,6 @@ Basically, the process is the following:
   - compute the distance in km to the reference point
   - sort by ascending distance
   - compute a geo score, based on a distance linear scale (0 is at the center, 1 is at the furthest)
-  - weighing the text based score with the geo ones. The weight is configurable and is 2:1 ratio for now
 - return the results or a 404 if no data
 
 The high-traffic mitigation is handled by a standard rate-limiter.

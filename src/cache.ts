@@ -1,4 +1,3 @@
-// -------------- types
 import { Transformer } from "./types";
 
 /** we support any specialized serializer */

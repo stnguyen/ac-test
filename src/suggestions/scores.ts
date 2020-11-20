@@ -11,20 +11,32 @@ type SuggestionWithDistance = Suggestion & {
   distance: number;
 };
 
+/**
+ * compute a linear scale based on a reference point and a max point (the furthest value in the provided sorted array)
+ * @param min
+ * @param key
+ * @param reverse
+ */
 export const computeLinearScaleScore = <T extends { score?: number }>(
   min: number,
   key: keyof T,
   reverse: boolean = false
 ) => (objects: T[]) => {
+  // the array is sorted, so we get the last element
   const max = (objects[objects.length - 1][key] as unknown) as number;
+
   return objects.map((object) => {
     const currentValue = (object[key] as unknown) as number;
-    const score = (currentValue - min) / (max - min);
-    const res = { ...object, score: reverse ? 1 - score : score };
+    //we get the current score as a ratio in the scale (min, max)
+    const score = Math.abs(currentValue - min) / (max - min);
+    const withComplement = reverse ? Math.abs(score - 1) : score;
+    //we merge back with the object
+    const res = { ...object, score: withComplement };
     return res;
   });
 };
 
+/** we compute a inverse linear scale based on the levenstein distance (0 means the furthest, 1 is an exact match)  */
 export function withLevensteinDistanceScore(
   reference: string,
   results: StoredCity[]
@@ -33,9 +45,6 @@ export function withLevensteinDistanceScore(
     map((result: StoredCity) => {
       return {
         ...result,
-        /**
-         * the levenstein distance gets the number of differents char from a reference
-         */
         distance: levenshteinDistance(reference, result.onlyName),
       };
     }),
@@ -53,42 +62,28 @@ export function withLevensteinDistanceScore(
  * weigh similar results depending on the distance to a given point
  * the scores must in order to produce a scale
  */
-export function withGeoDistanceScore(
+export const withGeoDistanceScore = (
   reference: RawCoordinates,
-  results: Suggestion[],
-  geoPriority: number = 2
-): Suggestion[] {
-  // enrich with distance
-  let withDistance = results.map((result) => ({
-    ...result,
-    distanceFromGeoCenter: distanceBetween(reference, {
-      latitude: result.latitude,
-      longitude: result.longitude,
-    }),
-  }));
-
-  // sort by distance from the provided reference
-  withDistance = sortByNumericalField(
-    "ASC",
-    "distanceFromGeoCenter",
-    withDistance
-  );
-
-  // get the furthest from the reference to build a linear scale
-  const furthestDistance = last(withDistance)?.distanceFromGeoCenter ?? -1;
-
-  //weigh the geolocation according the heuristic priority given as an input
-  return withDistance.map((result) => {
-    // linear scale here !
-    const geoScore = 1 - result.distanceFromGeoCenter / furthestDistance;
-    // barycenter of geoScore and actual score, rounded to 2 decimals when necessary
-    const newScore = twoDecimalsAtMost(
-      (geoPriority * geoScore + (result.score ?? 0)) / (geoPriority + 2)
-    );
-    return {
-      ...normalOmit(result, "distanceFromGeoCenter"),
-      // weigh geolocation 2x more than text accuracy
-      score: newScore,
-    } as Suggestion;
-  });
-}
+  results: Suggestion[]
+): Suggestion[] => {
+  return flow(
+    map((result: Suggestion) => ({
+      ...result,
+      distance: distanceBetween(reference, {
+        latitude: result.latitude,
+        longitude: result.longitude,
+      }),
+    })),
+    sortBy<SuggestionWithDistance>(["distance"]),
+    computeLinearScaleScore<SuggestionWithDistance>(0, "distance", true),
+    map((suggestion) => ({
+      ...suggestion,
+      score: twoDecimalsAtMost(suggestion.score),
+    })),
+    map(
+      flow(
+        omit<SuggestionWithDistance, "distance">(["distance"])
+      )
+    )
+  )(results);
+};

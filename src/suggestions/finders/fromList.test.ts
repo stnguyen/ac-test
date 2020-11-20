@@ -87,7 +87,7 @@ describe("Suggestions without index", () => {
     }).suggestions;
     const scores = suggestions.map((suggestion) => suggestion.score);
 
-    expect(scores).toEqual([0.75, 0.51, 0.44, 0]);
+    expect(scores).toEqual([1, 0.53, 0.38, 0]);
     expect(suggestions.map(omit("score"))).toEqual([
       {
         canonicalName: "london",
