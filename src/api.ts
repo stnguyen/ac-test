@@ -6,15 +6,17 @@ import {
   preSuggestionMiddlwareChain,
   suggestMiddleware,
 } from "./suggestions/api";
-import { cachedSuggestMiddleware } from "./suggestions/cache";
+import { cachedSuggester } from "./suggestions/cache";
 import { suggestFromIndex } from "./suggestions/finders/fromIndex";
 import { suggestFromList } from "./suggestions/finders/fromList";
+import morgan from "morgan";
 
 // TODO: provide DB as a middleware
 export const apiServer = (DB: CityDatabase) => {
   const app = require("express")();
   app.enable("trust proxy"); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
   app.use(dbMiddleware(DB));
+  app.use(morgan("tiny"));
 
   // 50 req/seq from an ip address
   const limiter = rateLimit({
@@ -25,7 +27,7 @@ export const apiServer = (DB: CityDatabase) => {
   app.get(
     "/suggestions",
     ...preSuggestionMiddlwareChain,
-    cachedSuggestMiddleware(suggestMiddleware(suggestFromList)),
+    suggestMiddleware(cachedSuggester(suggestFromList)),
     ...postSuggestionMiddlewareChain,
     limiter
   );

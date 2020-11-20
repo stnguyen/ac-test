@@ -2,7 +2,7 @@ import DB from "./data/db.json";
 import { apiServer } from "./src/api";
 import { CityDatabase } from "./src/cities/types";
 
-// globals
+// constants
 const PORT = process.env.PORT || 2345;
 const ADDRESS = process.env.URL || "0.0.0.0";
 
