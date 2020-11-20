@@ -1,30 +1,52 @@
-import fs from "fs";
-import { last, omit } from "lodash";
+import { flow, last, omit as normalOmit } from "lodash";
 import { distanceBetween, RawCoordinates } from "../geo";
 import { levenshteinDistance } from "../text";
 import { sortByNumericalField } from "../sort";
 import { twoDecimalsAtMost } from "../numbers";
-import { StoredCity } from "../cities";
+import { StoredCity } from "../cities/types";
 import { Suggestion } from "./types";
-import { Request } from "express";
+import { map, sortBy, omit } from "lodash/fp";
 
-/** load the index in memory for the sake of example */
-export const loadIndexFromFile = (file: string) =>
-  JSON.parse(fs.readFileSync(file, "utf-8"));
+type SuggestionWithDistance = Suggestion & {
+  distance: number;
+};
+
+export const computeLinearScaleScore = <T extends { score?: number }>(
+  min: number,
+  key: keyof T,
+  reverse: boolean = false
+) => (objects: T[]) => {
+  const max = (objects[objects.length - 1][key] as unknown) as number;
+  return objects.map((object) => {
+    const currentValue = (object[key] as unknown) as number;
+    const score = (currentValue - min) / (max - min);
+    const res = { ...object, score: reverse ? 1 - score : score };
+    return res;
+  });
+};
 
 export function withLevensteinDistanceScore(
   reference: string,
   results: StoredCity[]
 ): Suggestion[] {
-  return results.map((result) => ({
-    ...result,
-    /**
-     * the levenstein distance gets the number of differents char from a reference
-     */
-    score: twoDecimalsAtMost(
-      1 - levenshteinDistance(reference, result.onlyName) / reference.length
-    ),
-  }));
+  return flow(
+    map((result: StoredCity) => {
+      return {
+        ...result,
+        /**
+         * the levenstein distance gets the number of differents char from a reference
+         */
+        distance: levenshteinDistance(reference, result.onlyName),
+      };
+    }),
+    sortBy<SuggestionWithDistance>(["distance"]),
+    computeLinearScaleScore<SuggestionWithDistance>(0, "distance", true),
+    map(
+      flow(
+        omit<SuggestionWithDistance, "distance">(["distance"])
+      )
+    )
+  )(results);
 }
 
 /**
@@ -39,61 +61,34 @@ export function withGeoDistanceScore(
   // enrich with distance
   let withDistance = results.map((result) => ({
     ...result,
-    distanceFromPivot: distanceBetween(reference, {
+    distanceFromGeoCenter: distanceBetween(reference, {
       latitude: result.latitude,
       longitude: result.longitude,
     }),
   }));
 
-  // sort by distance from pivot
-  withDistance = sortByNumericalField("ASC", "distanceFromPivot", withDistance);
+  // sort by distance from the provided reference
+  withDistance = sortByNumericalField(
+    "ASC",
+    "distanceFromGeoCenter",
+    withDistance
+  );
 
-  // get closests and furthest to build a linear scale
-  //const closestDistance = first(withDistance)?.distanceFromPivot ?? -1;
-  const furthestDistance = last(withDistance)?.distanceFromPivot ?? -1;
+  // get the furthest from the reference to build a linear scale
+  const furthestDistance = last(withDistance)?.distanceFromGeoCenter ?? -1;
 
-  // weigh the geolocation according the heuristic priority given as an input
+  //weigh the geolocation according the heuristic priority given as an input
   return withDistance.map((result) => {
     // linear scale here !
-    const geoScore = 1 - result.distanceFromPivot / furthestDistance;
+    const geoScore = 1 - result.distanceFromGeoCenter / furthestDistance;
     // barycenter of geoScore and actual score, rounded to 2 decimals when necessary
     const newScore = twoDecimalsAtMost(
       (geoPriority * geoScore + (result.score ?? 0)) / (geoPriority + 2)
     );
     return {
-      ...omit(result, "distanceFromPivot"),
+      ...normalOmit(result, "distanceFromGeoCenter"),
       // weigh geolocation 2x more than text accuracy
       score: newScore,
-    };
+    } as Suggestion;
   });
-}
-
-/** utility function to validate incoming get params in the suggestions endpoint */
-export function validateParamsMiddleware(req: Request) {
-  const [query, latitude, longitude] = [
-    req.query.q,
-    req.query.latitude,
-    req.query.longitude,
-  ];
-  const hasQuery = query && query !== "";
-
-  const hasLatitude = !isNaN(parseFloat((latitude as string) ?? ""));
-  const hasLongitude = !isNaN(parseFloat((longitude as string) ?? ""));
-
-  const pivotIsDefined = hasLatitude && hasLongitude;
-
-  // TODO: extract pivot
-  return hasQuery
-    ? {
-        query,
-        ...(pivotIsDefined
-          ? {
-              pivot: {
-                latitude,
-                longitude,
-              },
-            }
-          : {}),
-      }
-    : null;
 }

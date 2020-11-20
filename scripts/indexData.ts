@@ -1,5 +1,6 @@
 /* istanbul ignore */
-import { CityDatabase, indexCities } from "../src/cities";
+import { indexCities } from "../src/cities";
+import { CityDatabase } from "../src/cities/types";
 /** the arguments provided */
 
 const argv = process.argv;

@@ -1,5 +1,5 @@
-import { sanitizeString } from "./text";
-import { indexCities, isCityValid, buildTextIndex } from "./cities";
+import { sanitizeString } from "../text";
+import { indexCities, isCityValid, buildTextIndex } from ".";
 
 jest.mock("line-reader", () => {
   const lineWalker = (data: string[]) => {

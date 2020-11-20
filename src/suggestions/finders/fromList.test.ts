@@ -44,7 +44,7 @@ describe("Suggestions without index", () => {
     const suggestions = suggestFromList(sampleDb as any, "London").suggestions;
     const scores = suggestions.map((suggestion) => suggestion.score);
 
-    expect(scores).toEqual([1, 1, 1, 0.17]);
+    expect(scores).toEqual([1, 1, 1, 0]);
     expect(suggestions.map(omit("score"))).toEqual([
       {
         id: "1",
@@ -80,14 +80,14 @@ describe("Suggestions without index", () => {
       },
     ]);
   });
-  it("should weight  near cities if a refence point is provided", () => {
+  it("should weight near cities if a refence point is provided", () => {
     const suggestions = suggestFromList(sampleDb as any, "London", {
       latitude: "42.98",
       longitude: "-81.24",
     }).suggestions;
     const scores = suggestions.map((suggestion) => suggestion.score);
 
-    expect(scores).toEqual([0.75, 0.51, 0.44, 0.04]);
+    expect(scores).toEqual([0.75, 0.51, 0.44, 0]);
     expect(suggestions.map(omit("score"))).toEqual([
       {
         canonicalName: "london",

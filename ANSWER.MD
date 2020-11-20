@@ -2,8 +2,6 @@
 
 A two step approach has been adopted to answer the requirements. The data file is generated ahead of time with the command `npm run index:data` and then queried by the api
 
-Of course in a real world setup, the data would come from a database or a search server.
-
 In the database generation phase the process is the following (see `scripts/indexData.js` and `utils/cities.js`):
 
 - get command line params
@@ -21,7 +19,7 @@ Basically, the process is the following:
   - go through each matched results,
   - compute the distance in km to the reference point
   - sort by ascending distance
-  - compute a geo score, based on the lowest, highest and current distance (a simple liner scale in fact)
+  - compute a geo score, based on a distance linear scale (0 is at the center, 1 is at the furthest)
   - weighing the text based score with the geo ones. The weight is configurable and is 2:1 ratio for now
 - return the results or a 404 if no data
 
@@ -30,10 +28,6 @@ The high-traffic mitigation is handled by a standard rate-limiter.
 # Testing
 
 `npm test` will run the tests. A pragmatic approach is used here: 100% coverage is not the only goal, but rather smarts tests are favored for the main features.
-
-# Deployment
-
-`git push heroku master`
 
 # Performance
 

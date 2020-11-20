@@ -1,48 +1,9 @@
 import lineReader from "line-reader";
 import { set, get, identity } from "lodash";
-import { tsvLineToMap } from "./tsv";
-import { sanitizeString } from "./text";
-import provinceFips from "../data/provinceFips.json";
-import { RawCoordinates } from "./geo";
-
-export interface City {
-  id: string;
-  name: string;
-  ascii: string;
-  alt_name: string;
-  lat: string;
-  long: string;
-  feat_class: string;
-  feat_code: string;
-  country: string;
-  cc2: string;
-  admin1: string;
-  admin2: string;
-  admin3: string;
-  admin4: string;
-  population: string;
-  elevation: string;
-  dem: string;
-  tz: string;
-  modified_at: string;
-}
-
-/** the type used to stored and indexed the cities after pre-processing */
-export interface StoredCity extends RawCoordinates {
-  id: string;
-  name: string;
-  canonicalName: string;
-  onlyName: string;
-}
-
-export interface CityDatabase {
-  objects: { [Id: string]: StoredCity };
-  cities: StoredCity[];
-  index: {
-    matches: { [NormalizedName: string]: string };
-    partials: { [PartialMatch: string]: string[] };
-  };
-}
+import { tsvLineToMap } from "../tsv";
+import { sanitizeString } from "../text";
+import provinceFips from "../../data/provinceFips.json";
+import { City, CityDatabase, StoredCity } from "./types";
 
 // constants
 const POPULATION_THRESHOLD = 5000;
@@ -78,7 +39,6 @@ export function isCityValid(city: City, threshold: number): boolean {
   return population > threshold;
 }
 
-//TODO: explain step by step
 /**
  * main function to index all the cities
  * This should be run ONCE, ahead of time.
@@ -107,6 +67,7 @@ export function indexCities(filePath: string) {
         const stateCode =
           (provinceFips as Record<string, string>)[lineObject.admin1] ||
           lineObject.admin1;
+
         const object = {
           id: lineObject.id,
           latitude: lineObject.lat,
@@ -128,8 +89,6 @@ export function indexCities(filePath: string) {
   });
 }
 
-// TODO: add a type for the index
-
 /**
  * build a text index with direct matches and partial matches with ids list
  */
@@ -149,8 +108,10 @@ export function buildTextIndex(
   db.index.matches[city.canonicalName] = id;
   // redirect partial matches
   for (let char of chars) {
+    // we construct the partial char by char
     path += char;
     const ids = get(db.index.partials, path) || [];
+    // we provide direct access to matching ids.
     ids.push(id);
     set(db.index.partials, path, ids);
   }

@@ -1,9 +1,10 @@
-import { CityDatabase } from "../cities";
-import { abstractSuggest } from "./abstract";
-import { prefixRegex, sanitizeString } from "../text";
+import { CityDatabase } from "../../cities/types";
+import { abstractSuggest } from "../abstract";
+import { prefixRegex, sanitizeString } from "../../text";
 
 /**
- * search all list item without index
+ * search in the all without index
+ * This is the naive approach, that can be compared to a table fullscan
  */
 export function findMatchesInList(db: CityDatabase, query: string) {
   const canonicalQuery = sanitizeString(query);

@@ -1,5 +1,3 @@
-import { curry } from "lodash/fp";
-
 type SORT_DIRECTION = "ASC" | "DSC";
 /**
  * sort a an array of object by a numerical field inside

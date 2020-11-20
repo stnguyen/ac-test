@@ -1,5 +1,5 @@
 import { withGeoDistanceScore, withLevensteinDistanceScore } from "./scores";
-import { CityDatabase } from "../cities";
+import { CityDatabase } from "../cities/types";
 import { CityFinder, Suggester, SuggestionsResults } from "./types";
 import { sortByNumericalField } from "../sort";
 import { RawCoordinates } from "../geo";
@@ -15,23 +15,24 @@ const noMatch: SuggestionsResults = {
 export const abstractSuggest = (finder: CityFinder): Suggester => (
   db: CityDatabase,
   query: string,
-  pivot: RawCoordinates | null = null
+  geocenter: RawCoordinates | null = null
 ): SuggestionsResults => {
   if (query !== "") {
     // sanitized version of the query
-    let matches = finder(db, query);
+    const matches = finder(db, query);
     if (matches.length === 0) return noMatch;
 
-    matches = withLevensteinDistanceScore(query, matches);
+    let matchesWithScores = withLevensteinDistanceScore(query, matches);
 
     // weight by geolocation
-    if (pivot) {
-      matches = withGeoDistanceScore(pivot, matches);
+    if (geocenter) {
+      matchesWithScores = withGeoDistanceScore(geocenter, matchesWithScores);
     }
+
     // sort by score
-    matches = sortByNumericalField("DSC", "score", matches);
+    matchesWithScores = sortByNumericalField("DSC", "score", matchesWithScores);
     return {
-      suggestions: matches,
+      suggestions: matchesWithScores,
     };
   }
 

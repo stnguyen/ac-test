@@ -1,6 +1,6 @@
 import { get, set, clear, fromCacheOr } from "./cache";
 
-describe.only("Cache", () => {
+describe("Cache", () => {
   beforeAll(() => {
     clear();
   });

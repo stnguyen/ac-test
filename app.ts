@@ -1,6 +1,6 @@
 import DB from "./data/db.json";
 import { apiServer } from "./src/api";
-import { CityDatabase } from "./src/cities";
+import { CityDatabase } from "./src/cities/types";
 
 // globals
 const PORT = process.env.PORT || 2345;

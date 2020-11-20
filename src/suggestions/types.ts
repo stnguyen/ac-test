@@ -1,4 +1,5 @@
-import { CityDatabase, StoredCity } from "../cities";
+import { CityDatabase, StoredCity } from "../cities/types";
+import { RawCoordinates } from "../geo";
 export type CityFinder = (db: CityDatabase, query: string) => StoredCity[];
 
 export interface Suggestion extends StoredCity {
@@ -10,7 +11,12 @@ export interface SuggestionsResults {
 }
 
 export type Suggester = (
-  DB: CityDatabase,
+  db: CityDatabase,
   query: string,
   ...options: any[]
 ) => SuggestionsResults;
+
+export interface SuggestionsQuery {
+  query: string;
+  center?: RawCoordinates;
+}
